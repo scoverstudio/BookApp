@@ -1,28 +1,12 @@
-/* eslint-disable no-unused-labels */
-/* eslint-disable quotes */
-/* eslint-disable for-direction */
-/* eslint-disable no-undef */
-/* eslint-disable indent */
-/* eslint-disable no-unused-vars */
-/* eslint-disable no-empty */
-
-
-const bookList = document.querySelector('.books-list');
-const filters = document.querySelector('.filters');
-
-const favoriteBooks = [];
-const filtersArr = [];
-
-const select = {
-    templateOf: {
-        bookList: '#template-book',
-    },
-};
-
-const templates = {
-    bookList: Handlebars.compile(document.querySelector(select.templateOf.bookList).innerHTML),
-
-};
+import {
+    templates
+} from '../settings.js';
+import {
+    utils
+} from '../utils.js';
+import {
+    dataSource
+} from '../data.js';
 
 
 class BookList {
@@ -30,8 +14,8 @@ class BookList {
         const thisBook = this;
 
         thisBook.determineRatingBgc();
-        thisBook.initData();
         thisBook.getElements();
+        thisBook.initData();
         thisBook.filterBooks();
         thisBook.initActions();
 
@@ -54,21 +38,25 @@ class BookList {
             const generatedHTML = templates.bookList(dataSource.books[bookId]);
             const generatedDOM = utils.createDOMFromHTML(generatedHTML);
 
-            bookList.appendChild(generatedDOM);
+            thisBook.bookList.appendChild(generatedDOM);
         }
     }
 
     getElements() {
         const thisBook = this;
 
-        thisBook.books = document.querySelectorAll('.book__image');
+        thisBook.bookList = document.querySelector('.books-list');
+        thisBook.filtersArr = [];
+        thisBook.filters = document.querySelector('.filters');
 
     }
 
     initActions() {
         const thisBook = this;
+        const books = document.querySelectorAll('.book__image');
 
-        for (const book of thisBook.books) {
+        const favoriteBooks = [];
+        for (const book of books) {
             const bookId = book.getAttribute('data-id');
 
             book.addEventListener('dblclick', function (event) {
@@ -88,15 +76,15 @@ class BookList {
                 event.preventDefault();
             });
 
-            // clickanie tekstu działa na dodawanie i odejmowanie w tablicy
-            filters.addEventListener('click', function (event) {
+            thisBook.filters.addEventListener('click', function (event) {
                 const clickedBook = event.target;
-                if (clickedBook.getAttribute('type') === 'checkbox' && clickedBook.getAttribute('name') === 'filter' && clickedBook.tagName === 'INPUT') {}
-                if (clickedBook.checked === true) {
-                    filtersArr.push(clickedBook.value);
-                } else {
-                    const indexOfFilters = filtersArr.indexOf(clickedBook.value);
-                    filtersArr.splice(indexOfFilters, 1);
+                if (clickedBook.getAttribute('type') === 'checkbox' && clickedBook.getAttribute('name') === 'filter' && clickedBook.tagName === 'INPUT') {
+                    if (clickedBook.checked === true) {
+                        thisBook.filtersArr.push(clickedBook.value);
+                    } else {
+                        const indexOfFilters = thisBook.filtersArr.indexOf(clickedBook.value);
+                        thisBook.filtersArr.splice(indexOfFilters, 1);
+                    }
                 }
                 thisBook.filterBooks();
             });
@@ -108,7 +96,7 @@ class BookList {
         for (const book of dataSource.books) {
             const bookId = book.id;
             let shouldBeHidden = false;
-            for (const filter of filtersArr) {
+            for (const filter of thisBook.filtersArr) {
                 if (!book.details[filter]) {
                     shouldBeHidden = true;
                     break;
@@ -139,4 +127,4 @@ class BookList {
     }
 }
 
-const app = new BookList();
+export default BookList;

@@ -1,5 +1,5 @@
 /* eslint-disable indent */
-const dataSource = {}; // eslint-disable-line no-unused-vars
+export const dataSource = {}; // eslint-disable-line no-unused-vars
 
 dataSource.books = [{
     id: 1,
